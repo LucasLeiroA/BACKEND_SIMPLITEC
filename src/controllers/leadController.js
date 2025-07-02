@@ -21,7 +21,6 @@ const getLeadsByDealer = async (req, res) => {
     }
 };
 
-
 const createLead = async (req, res) => {
     try {
         const dealerId = parseInt(req.params.dealerId);
@@ -34,16 +33,25 @@ const createLead = async (req, res) => {
 
         if (!post) return res.status(404).json({ error: 'Publicación no encontrada' });
 
-        const lead = await prisma.lead.create({
-            data: {
-                dealerId,
-                postId: post.id,
-                name,
-                lastname,
-                email,
-                phone
-            }
-        });
+        let leadData = {
+            dealerId,
+            postId: post.id,
+            name,
+            lastname,
+            email,
+            phone
+        };
+
+        if (req.user && req.user.role === 'client') {
+            const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+            leadData = {
+                ...leadData,
+                name: user.name || name,
+                lastname: user.lastname || lastname,
+                email: user.email,
+            };
+        }
 
         if (post.dealer?.email) {
             const subject = `Nuevo lead para tu publicación: ${post.title}`;
@@ -58,12 +66,16 @@ const createLead = async (req, res) => {
             await sendLeadEmail(post.dealer.email, subject, html);
         }
 
+
+        const lead = await prisma.lead.create({ data: leadData });
+
         res.status(201).json(lead);
     } catch (error) {
         console.error('Error al crear lead:', error);
         res.status(500).json({ error: 'Error al crear lead' });
     }
 };
+
 
 
 module.exports = {
