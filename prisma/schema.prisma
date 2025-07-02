@@ -1,0 +1,112 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Dealer {
+  id          Int         @id @default(autoincrement())
+  name        String
+  address     String
+  email       String
+  phone       String
+  vehicles    Vehicle[]
+  accessories Accessory[]
+  posts       Post[]
+  leads       Lead[]
+  users       User[]
+}
+
+model Vehicle {
+  id             Int             @id @default(autoincrement())
+  dealerId       Int
+  brand          String
+  model          String
+  year           Int
+  price          Float
+  fuelType       String
+  transmission   String
+  doors          Int
+  bodyType       String
+  stock          Int
+
+  dealer         Dealer          @relation(fields: [dealerId], references: [id])
+  images         VehicleImage[]
+  accessories    Accessory[]
+  posts          PostVehicle[]   // M:N con Post
+}
+
+model VehicleImage {
+  id        Int     @id @default(autoincrement())
+  vehicleId Int
+  url       String
+  order     Int
+  publicId  String 
+
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+}
+
+model Accessory {
+  id          Int     @id @default(autoincrement())
+  dealerId    Int
+  vehicleId   Int
+  name        String
+  description String
+  price       Float
+  stock       Int
+
+  dealer      Dealer   @relation(fields: [dealerId], references: [id])
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model Post {
+  id           Int             @id @default(autoincrement())
+  dealerId     Int
+  title        String
+  description  String
+  price        Float
+  images       Json
+
+  dealer       Dealer          @relation(fields: [dealerId], references: [id])
+  leads        Lead[]
+  vehicles     PostVehicle[]   // M:N con Vehicle
+}
+
+// Tabla intermedia para relación M:N entre Post y Vehicle
+model PostVehicle {
+  id        Int     @id @default(autoincrement())
+  postId    Int
+  vehicleId Int
+
+  post      Post    @relation(fields: [postId], references: [id])
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@unique([postId, vehicleId]) // evita duplicados
+}
+
+model Lead {
+  id        Int     @id @default(autoincrement())
+  dealerId  Int
+  postId    Int
+  name      String
+  lastname  String
+  email     String
+  phone     String
+
+  dealer    Dealer @relation(fields: [dealerId], references: [id])
+  post      Post   @relation(fields: [postId], references: [id])
+}
+
+model User {
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  passwordHash String
+  role         String
+dealerId     Int?
+dealer       Dealer? @relation(fields: [dealerId], references: [id])
+}
+
