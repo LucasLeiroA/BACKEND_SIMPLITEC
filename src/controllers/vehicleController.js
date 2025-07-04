@@ -231,11 +231,9 @@ const filterVehiclesByDealer = async (req, res) => {
             yearMax,
             priceMin,
             priceMax,
+            page = 1,
+            limit = 10,
         } = req.query
-
-
-        console.log(req.query);
-        
 
         const filters = {
             dealerId,
@@ -271,15 +269,27 @@ const filterVehiclesByDealer = async (req, res) => {
             }
         }
 
-        const vehicles = await prisma.vehicle.findMany({
-            where: filters,
-            include: {
-                images: { orderBy: { order: 'asc' } },
-            },
-        })
-        
+        const skip = (Number(page) - 1) * Number(limit)
+        const take = Number(limit)
 
-        res.json(vehicles)
+        const [vehicles, total] = await Promise.all([
+            prisma.vehicle.findMany({
+                where: filters,
+                include: {
+                    images: { orderBy: { order: 'asc' } },
+                },
+                skip,
+                take,
+            }),
+            prisma.vehicle.count({ where: filters }),
+        ])
+
+        res.json({
+            vehicles,
+            total,
+            page: Number(page),
+            totalPages: Math.ceil(total / limit),
+        })
     } catch (error) {
         console.error('Error al filtrar vehículos:', error)
         res.status(500).json({ error: 'Error interno del servidor' })

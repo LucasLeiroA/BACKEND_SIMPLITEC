@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   db:
     image: postgres
@@ -11,6 +12,42 @@ services:
       POSTGRES_DB: simplictec_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis
+    container_name: redis-simplitec
+    ports:
+      - "6379:6379"
+
+  backend:
+    image: node:18
+    container_name: backend-simplitec
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/simplictec_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  worker:
+    image: node:18
+    container_name: lead-worker
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npm run start:worker
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
 volumes:
   postgres_data:

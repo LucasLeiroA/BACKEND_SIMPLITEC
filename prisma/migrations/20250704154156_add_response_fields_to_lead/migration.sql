@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "Lead" ADD COLUMN     "responded" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "respondedAt" TIMESTAMP(3),
+ADD COLUMN     "userReplyId" INTEGER,
+ALTER COLUMN "response" DROP NOT NULL,
+ALTER COLUMN "response" DROP DEFAULT,
+ALTER COLUMN "response" SET DATA TYPE TEXT;
+
+-- AddForeignKey
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_userReplyId_fkey" FOREIGN KEY ("userReplyId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

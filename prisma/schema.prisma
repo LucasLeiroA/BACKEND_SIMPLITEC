@@ -90,20 +90,25 @@ model PostVehicle {
 }
 
 model Lead {
-  id         Int     @id @default(autoincrement())
-  dealerId   Int
-  postId     Int?
-  vehicleId  Int?
+  id          Int      @id @default(autoincrement())
+  dealerId    Int
+  postId      Int?
+  vehicleId   Int?
 
-  name       String
-  lastname   String
-  email      String
-  phone      String
-  response   Boolean @default(false) 
+  name        String
+  lastname    String
+  email       String
+  phone       String
 
-  dealer     Dealer   @relation(fields: [dealerId], references: [id])
-  post       Post?    @relation(fields: [postId], references: [id])
-  vehicle    Vehicle? @relation(fields: [vehicleId], references: [id])
+  responded   Boolean   @default(false)
+  response    String?
+  respondedAt DateTime?
+  userReplyId Int?
+
+  dealer      Dealer    @relation(fields: [dealerId], references: [id])
+  post        Post?     @relation(fields: [postId], references: [id])
+  vehicle     Vehicle?  @relation(fields: [vehicleId], references: [id])
+  userReply   User?     @relation("UserReply", fields: [userReplyId], references: [id])
 }
 
 
@@ -112,7 +117,9 @@ model User {
   email        String  @unique
   passwordHash String
   role         String
+  repliedLeads Lead[] @relation("UserReply")
 dealerId     Int?
 dealer       Dealer? @relation(fields: [dealerId], references: [id])
+
 }
 
