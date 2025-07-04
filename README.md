@@ -1,173 +1,174 @@
-# 🚗 SimpliTEC Backend - Prueba Técnica Fullstack
+# 📦 SimpliTEC - Backend
 
-Este proyecto es la solución completa al desafío técnico Fullstack de SimpliTEC. Implementa un backend profesional usando Node.js, Express, Prisma y PostgreSQL, completamente contenerizado con Docker. Integra autenticación JWT con roles, manejo de archivos con Cloudinary, validaciones, emails automáticos y testing automatizado con Jest + Supertest.
+Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gestión de concesionarios, vehículos, publicaciones, accesorios y leads.
 
----
-
-## 🔧 Tecnologías utilizadas
-
-* **Node.js** + **Express**
-* **Prisma ORM** + **PostgreSQL**
-* **Docker + Docker Compose**
-* **JWT** para autenticación y control de acceso por rol
-* **Multer** + **Cloudinary** para subida de imágenes
-* **Nodemailer** para envío de correos automáticos
-* **Jest** + **Supertest** para testing
-* **dotenv**, **cors**, **bcrypt**, etc.
+> Este backend está desarrollado con **Node.js**, **Express**, **Prisma** y **PostgreSQL**, y se ejecuta fácilmente con **Docker**.
 
 ---
 
-## 📂 Estructura del proyecto
+## 🚀 Tecnologías principales
+
+- Node.js 18
+- Express
+- Prisma ORM
+- PostgreSQL
+- JWT Auth
+- Cloudinary (para imágenes)
+- Docker / Docker Compose
+
+---
+
+## 📁 Estructura del proyecto
 
 ```
-/src
-├── controllers/         # Lógica de negocio
-├── routes/              # Definición de endpoints
-├── middlewares/         # Autenticación, validaciones
-├── utils/               # Helpers (mailer, etc.)
-├── config/              # Cloudinary, Prisma
-├── app.js               # Configuración Express
-├── index.js             # Entry point
-/tests                   # Tests automatizados
+├── prisma/               # Migraciones y schema.prisma
+├── src/                  # Código fuente del backend
+│   ├── controllers/
+│   ├── middlewares/
+│   ├── routes/
+│   ├── services/
+│   └── index.js
+├── Dockerfile            # Backend Dockerfile
+├── docker-compose.yml    # Compose para backend + PostgreSQL
+├── .env                  # Variables de entorno (local)
+├── package.json
+└── README.md
 ```
 
 ---
 
-## 🧪 Tests automatizados
+## 🔧 Requisitos
 
-* Configurado con Jest + Supertest
-* Test para endpoints públicos y protegidos
-* Incluye:
+- Docker y Docker Compose instalados ✅
 
-  * `GET /dealers`
-  * `POST /dealer/:id/leads`
-  * `POST /vehicles` con autenticación JWT
+---
 
-Ejecutar tests:
+## 🛠️ Configuración inicial (con Docker)
+
+### 1. Clonar el repositorio
 
 ```bash
-npm test
+git clone https://github.com/tu-usuario/simplitec-backend.git
+cd simplictec-backend
 ```
 
----
+### 2. Crear archivo `.env`
 
-## 🔐 Autenticación y roles
-
-El sistema implementa JWT y control de acceso basado en roles:
-
-* **admin**: puede crear/editar/eliminar dealers
-* **dealer**: puede gestionar sus publicaciones, vehículos, accesorios y ver sus leads
-
-### Endpoints:
-
-* `POST /auth/register` → Crear usuario (admin o dealer)
-* `POST /auth/login` → Login y generación de token
-
-> El token JWT debe enviarse en `Authorization: Bearer <token>` en rutas protegidas
-
----
-
-## 📦 Endpoints disponibles (resumen)
-
-### Dealers
-
-* `GET /dealers`
-* `GET /dealers/:id`
-* `POST /dealers` → solo admin
-* `PUT /dealers/:id` → solo admin
-* `DELETE /dealers/:id` → solo admin
-
-### Vehicles
-
-* `GET /vehicles/dealers/:id` → público
-* `GET /vehicles/dealers/:id/:vehicleId`
-* `POST /vehicles` → solo dealer (con imágenes)
-* `PUT /vehicles/:id/:vehicleId` → solo dealer (con imágenes)
-* `DELETE /vehicles/dealers/:id/:vehicleId`
-
-### Accessories
-
-* `GET /accesory/dealer/:dealerId/accessories`
-* `POST /accesory/dealer/:dealerId/accessories` → dealer
-
-### Posts
-
-* `GET /post/dealer/:dealerId/posts`
-* `GET /post/dealer/:dealerId/posts/search?text=...`
-* `POST /post/dealer/:dealerId/posts` → dealer (con imágenes)
-* `DELETE /post/dealer/:dealerId/posts/:id` → dealer
-
-### Leads
-
-* `POST /leads/dealer/:dealerId/leads` → público
-* `GET /leads/dealer/:dealerId/leads` → dealer
-
----
-
-## 📸 Subida de imágenes con Cloudinary
-
-* Se utiliza `multer` con Cloudinary para subir imágenes desde formularios o Postman
-* Las imágenes se almacenan por carpeta (`vehicles/`, `posts/`)
-* Al editar/eliminar un post o vehículo, se eliminan las imágenes anteriores
-
----
-
-## 📧 Emails automáticos
-
-* Al crear un lead, se envía un correo al `dealer.email` asociado al post
-* El contenido incluye datos del interesado y el título de la publicación
-* Configurable por `.env`
-
----
-
-## ⚙️ Variables de entorno - `.env.example`
-
-```
-DATABASE_URL=postgresql://usuario:password@localhost:5432/simplitec
-JWT_SECRET=clave_secreta_segura
-MAIL_USER=micorreo@gmail.com
-MAIL_PASS=clave_app_google
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
+```env
+DATABASE_URL=postgresql://postgres:postgres@db:5432/simplictec_db
+JWT_SECRET=supersecret
+CLOUDINARY_CLOUD_NAME=your_cloud
+CLOUDINARY_API_KEY=your_key
+CLOUDINARY_API_SECRET=your_secret
 ```
 
----
+Podés dejar los valores de Cloudinary vacíos si no los vas a usar aún.
 
-## 🐳 Docker (opcional)
 
-Incluye configuración con Docker Compose para levantar el backend + base PostgreSQL
+### 3. Levantar los contenedores
 
 ```bash
 docker-compose up --build
 ```
 
----
+Esto va a:
+- Crear un contenedor `simplictec_db` (PostgreSQL)
+- Crear un contenedor `simplictec_backend` (Node.js)
+- Aplicar las migraciones (`prisma migrate deploy`)
+- Crear automáticamente un usuario admin
 
-## 📌 Requisitos para correr el proyecto
+### 4. Backend activo en:
 
-1. Tener Node.js, npm y Docker instalados
-2. Crear un archivo `.env` basado en `.env.example`
-3. Instalar dependencias:
-
-```bash
-npm install
 ```
-
-4. Ejecutar migraciones:
-
-```bash
-npx prisma migrate dev
-```
-
-5. Ejecutar el servidor:
-
-```bash
-npm run dev
+http://localhost:3001
 ```
 
 ---
 
-## 💬 Contacto
+## 👤 Usuario admin creado automáticamente
 
-Desarrollado por Lucas Leiro para SimpliTEC - 2025
+| Campo     | Valor                 |
+|-----------|-----------------------|
+| Email     | `admin@simplitec.com` |
+| Contraseña| `admin123`            |
+| Rol       | `ADMIN`               |
+
+Podés iniciar sesión y obtener el token JWT desde el frontend o vía Postman:
+
+```
+POST /auth/login
+{
+  "email": "admin@simplitec.com",
+  "password": "admin123"
+}
+```
+
+---
+
+## 📥 Comandos útiles
+
+### 🔄 Reiniciar todo desde cero (solo para desarrollo):
+```bash
+docker-compose down -v
+npx prisma migrate reset
+```
+
+### 🧱 Ver base de datos en navegador:
+```bash
+npx prisma studio
+```
+
+### 🛠 Volver a aplicar migraciones:
+```bash
+npx prisma migrate deploy
+```
+
+---
+
+## 📦 Scripts disponibles (en `package.json`)
+
+```json
+"scripts": {
+  "dev": "nodemon src/index.js",
+  "start": "node src/index.js",
+  "migrate": "prisma migrate dev",
+  "deploy": "prisma migrate deploy",
+  "studio": "prisma studio"
+}
+```
+
+---
+
+## 🧪 Endpoints principales (resumen)
+
+- **/auth/login** → Login con JWT
+- **/auth/register** → Registro de usuario
+- **/vehicles** → CRUD de vehículos
+- **/posts** → Publicaciones
+- **/leads** → Leads (cotizaciones)
+- **/accessories** → Accesorios
+
+Todas las rutas protegidas requieren el header:
+
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## 🧑‍💻 Contribución
+
+1. Cloná el repo
+2. Instalá dependencias
+3. Usá Docker para levantar todo rápido
+4. ¡Enviá tus mejoras con un pull request!
+
+---
+
+## 📬 Contacto
+
+Para soporte o consultas: **lucasleiroa@gmail.com**
+
+---
+
+¡Gracias por usar **SimpliTEC Backend**! 🚗🔧
