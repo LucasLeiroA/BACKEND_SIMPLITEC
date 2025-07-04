@@ -43,16 +43,20 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 
 ---
 
-## 🛠️ Configuración inicial (con Docker)
+## 🚀 FLUJO COMPLETO PARA LEVANTAR EL PROYECTO DESDE CERO
 
-### 1. Clonar el repositorio
+### 1. 📥 Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/simplitec-backend.git
+git clone https://github.com/tu-usuario/simplictec-backend.git
 cd simplictec-backend
 ```
 
-### 2. Crear archivo `.env`
+---
+
+### 2. ⚙️ Crear el archivo `.env`
+
+En la raíz del proyecto, crear un archivo llamado `.env` con el siguiente contenido:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@db:5432/simplictec_db
@@ -62,41 +66,37 @@ CLOUDINARY_API_KEY=your_key
 CLOUDINARY_API_SECRET=your_secret
 ```
 
-Podés dejar los valores de Cloudinary vacíos si no los vas a usar aún.
+> 🔐 Los datos de Cloudinary se pueden dejar vacíos si no vas a trabajar con imágenes por ahora.
 
+---
 
-### 3. Levantar los contenedores
+### 3. 🐳 Levantar todo con Docker Compose
+
+Ejecutá:
 
 ```bash
 docker-compose up --build
 ```
 
-Esto va a:
-- Crear un contenedor `simplictec_db` (PostgreSQL)
-- Crear un contenedor `simplictec_backend` (Node.js)
-- Aplicar las migraciones (`prisma migrate deploy`)
-- Crear automáticamente un usuario admin
-
-### 4. Backend activo en:
-
-```
-http://localhost:3001
-```
+Este comando:
+- Levanta un contenedor PostgreSQL (`simplictec_db`)
+- Construye el backend y aplica las migraciones con `npx prisma migrate deploy`
+- Crea automáticamente un usuario admin de prueba en la base de datos
 
 ---
 
-## 👤 Usuario admin creado automáticamente
+### 4. ✅ Usuario admin de prueba creado automáticamente
 
 | Campo     | Valor                 |
 |-----------|-----------------------|
-| Email     | `admin@simplitec.com` |
+| Email     | `admin@gmail.com` |
 | Contraseña| `admin123`            |
-| Rol       | `ADMIN`               |
+| Rol       | `admin`               |
 
-Podés iniciar sesión y obtener el token JWT desde el frontend o vía Postman:
+Puedes iniciar sesión directamente vía frontend o con herramientas como Postman:
 
 ```
-POST /auth/login
+POST http://localhost:3001/auth/login
 {
   "email": "admin@simplitec.com",
   "password": "admin123"
@@ -105,22 +105,40 @@ POST /auth/login
 
 ---
 
+### 5. 🌐 El backend estará disponible en:
+
+```
+http://localhost:3001
+```
+
+---
+
+### 6. (Opcional) Ver base de datos en navegador
+
+```bash
+npx prisma studio
+```
+
+Esto abrirá una interfaz gráfica para explorar tus tablas y datos.
+
+---
+
 ## 📥 Comandos útiles
 
-### 🔄 Reiniciar todo desde cero (solo para desarrollo):
+- 🔁 Reiniciar todo desde cero:
 ```bash
 docker-compose down -v
 npx prisma migrate reset
 ```
 
-### 🧱 Ver base de datos en navegador:
-```bash
-npx prisma studio
-```
-
-### 🛠 Volver a aplicar migraciones:
+- 📦 Aplicar migraciones manualmente:
 ```bash
 npx prisma migrate deploy
+```
+
+- 📊 Abrir Prisma Studio:
+```bash
+npx prisma studio
 ```
 
 ---
