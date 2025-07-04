@@ -12,7 +12,6 @@ Este proyecto corresponde al backend del sistema **SimpliTEC**, desarrollado en 
 - **Cloudinary** (almacenamiento de imágenes)
 - **Nodemailer** + **Gmail**
 - **JWT** (autenticación)
-- **Swagger** (documentación de la API)
 
 ## ⚙️ FLUJO COMPLETO PARA LEVANTAR EL BACKEND
 
