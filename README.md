@@ -14,7 +14,7 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 - PostgreSQL
 - JWT Auth
 - Cloudinary (para imágenes)
-- Docker (opcional)
+- Docker 
 
 ---
 
@@ -36,12 +36,7 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 
 ---
 
-## 🔧 Requisitos
 
-- Node.js >= 18
-- Docker y Docker Compose (recomendado)
-
----
 
 ## 🚀 FLUJO COMPLETO PARA LEVANTAR EL BACKEND
 
@@ -67,7 +62,7 @@ npm install
 Copiá el archivo `.env.example` y completalo con tus credenciales:
 
 ```bash
-cp .env.example .env
+ .env
 ```
 
 > Nunca subas tus credenciales reales (`DATABASE_URL`, `JWT_SECRET`, `CLOUDINARY_API_*`, `MAIL_PASS`) a GitHub. Usá `.env.example` como referencia.
@@ -97,23 +92,6 @@ http://localhost:3001
 
 ---
 
-### 6. 🐳 Alternativa: levantar con Docker
-
-Si querés usar Docker (recomendado):
-
-```bash
-docker-compose up --build
-```
-
-Esto levantará:
-- PostgreSQL (`db`)
-- Redis (`redis`)
-- Backend (`backend-simplitec`)
-- Worker de leads (`lead-worker`)
-
-Ya no necesitás correr Prisma manualmente: lo hace el contenedor.
-
----
 
 ### ✅ Usuario admin creado automáticamente (por migración)
 
