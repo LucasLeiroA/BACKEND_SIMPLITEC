@@ -91,24 +91,7 @@ http://localhost:3001
 ```
 
 
-## 📁 Estructura del proyecto
 
-```
-simplictec-backend/
-├── src/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   └── utils/
-├── prisma/
-│   ├── schema.prisma
-│   └── migrations/
-├── docker-compose.yml
-├── .env.example
-└── README.md
-```
 
 
 **Desarrollado con ❤️ por el equipo de SimpliTEC**
