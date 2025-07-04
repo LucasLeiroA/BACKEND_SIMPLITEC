@@ -105,68 +105,87 @@ const createVehicle = async (req, res) => {
 
 const updateVehicle = async (req, res) => {
     try {
-        const dealerId = parseInt(req.params.id);
-        const vehicleId = parseInt(req.params.vehicleId);
-        const files = req.files || [];
+        const dealerId = parseInt(req.params.id)
+        const vehicleId = parseInt(req.params.vehicleId)
+        const files = req.files || []
 
+        console.log({ dealerId })
+        console.log({ vehicleId })
+
+        // Verificamos si existe el vehículo con ese ID y dealer
         const vehicle = await prisma.vehicle.findFirst({
-            where: { id: vehicleId, dealerId },
-        });
+            where: { id: vehicleId, dealerId }
+        })
 
-        if (!vehicle) return res.status(404).json({ error: 'Vehículo no encontrado' });
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehículo no encontrado' })
+        }
 
-        const oldImages = await prisma.vehicleImage.findMany({ where: { vehicleId } });
+        // Eliminar imágenes anteriores si hay nuevas
+        const oldImages = await prisma.vehicleImage.findMany({ where: { vehicleId } })
 
         for (const image of oldImages) {
             if (image.publicId) {
-                await cloudinary.uploader.destroy(image.publicId);
+                await cloudinary.uploader.destroy(image.publicId)
             }
         }
 
-        await prisma.vehicleImage.deleteMany({ where: { vehicleId } });
+        await prisma.vehicleImage.deleteMany({ where: { vehicleId } })
 
-        const uploadedImages = [];
+        // Subir nuevas imágenes
+        const uploadedImages = []
 
         for (let i = 0; i < files.length; i++) {
             const result = await cloudinary.uploader.upload(files[i].path, {
                 folder: 'vehicles',
-            });
+            })
 
             uploadedImages.push({
                 vehicleId,
                 url: result.secure_url,
                 publicId: result.public_id,
-                order: i + 1,
-            });
+                order: req.body.orders?.[i] ? Number(req.body.orders[i]) : i + 1
+            })
         }
 
         if (uploadedImages.length > 0) {
-            await prisma.vehicleImage.createMany({ data: uploadedImages });
+            await prisma.vehicleImage.createMany({ data: uploadedImages })
         }
 
+        // Actualizar vehículo (conversión explícita de tipos numéricos)
         const updatedVehicle = await prisma.vehicle.update({
             where: { id: vehicleId },
             data: {
-                ...req.body,
+                brand: req.body.brand,
+                model: req.body.model,
+                fuelType: req.body.fuelType,
+                transmission: req.body.transmission,
+                bodyType: req.body.bodyType,
+                dealerId: dealerId, // ✅ ya es número
                 year: req.body.year ? Number(req.body.year) : undefined,
                 price: req.body.price ? Number(req.body.price) : undefined,
                 doors: req.body.doors ? Number(req.body.doors) : undefined,
                 stock: req.body.stock ? Number(req.body.stock) : undefined,
             },
-            include: { images: true },
-        });
+            include: {
+                images: true
+            }
+        })
 
-        res.json(updatedVehicle);
+        res.json(updatedVehicle)
     } catch (error) {
-        console.error('Error al actualizar vehículo:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        console.error('Error al actualizar vehículo:', error)
+        res.status(500).json({ error: 'Error interno del servidor' })
     }
-};
+}
+
 
 const deleteVehicle = async (req, res) => {
     try {
         const dealerId = parseInt(req.params.id);
         const vehicleId = parseInt(req.params.vehicleId);
+
+
 
         const vehicle = await prisma.vehicle.findFirst({
             where: { id: vehicleId, dealerId },
@@ -199,10 +218,83 @@ const deleteVehicle = async (req, res) => {
     }
 };
 
+
+const filterVehiclesByDealer = async (req, res) => {
+    try {
+        const dealerId = parseInt(req.params.dealerId)
+        const {
+            fuelType,
+            transmission,
+            bodyType,
+            doors,
+            yearMin,
+            yearMax,
+            priceMin,
+            priceMax,
+        } = req.query
+
+
+        console.log(req.query);
+        
+
+        const filters = {
+            dealerId,
+        }
+
+        if (fuelType) {
+            filters.fuelType = { in: Array.isArray(fuelType) ? fuelType : [fuelType] }
+        }
+
+        if (transmission) {
+            filters.transmission = { in: Array.isArray(transmission) ? transmission : [transmission] }
+        }
+
+        if (bodyType) {
+            filters.bodyType = { in: Array.isArray(bodyType) ? bodyType : [bodyType] }
+        }
+
+        if (doors) {
+            filters.doors = Number(doors)
+        }
+
+        if (yearMin || yearMax) {
+            filters.year = {
+                ...(yearMin && { gte: Number(yearMin) }),
+                ...(yearMax && { lte: Number(yearMax) }),
+            }
+        }
+
+        if (priceMin || priceMax) {
+            filters.price = {
+                ...(priceMin && { gte: Number(priceMin) }),
+                ...(priceMax && { lte: Number(priceMax) }),
+            }
+        }
+
+        const vehicles = await prisma.vehicle.findMany({
+            where: filters,
+            include: {
+                images: { orderBy: { order: 'asc' } },
+            },
+        })
+        
+
+        res.json(vehicles)
+    } catch (error) {
+        console.error('Error al filtrar vehículos:', error)
+        res.status(500).json({ error: 'Error interno del servidor' })
+    }
+}
+
+
+
+
+
 module.exports = {
     getAllByDealer,
     getById,
     createVehicle,
     updateVehicle,
     deleteVehicle,
+    filterVehiclesByDealer
 };

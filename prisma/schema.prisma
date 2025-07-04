@@ -37,7 +37,8 @@ model Vehicle {
   dealer         Dealer          @relation(fields: [dealerId], references: [id])
   images         VehicleImage[]
   accessories    Accessory[]
-  posts          PostVehicle[]   // M:N con Post
+  posts          PostVehicle[]
+  leads          Lead[]          
 }
 
 model VehicleImage {
@@ -89,17 +90,22 @@ model PostVehicle {
 }
 
 model Lead {
-  id        Int     @id @default(autoincrement())
-  dealerId  Int
-  postId    Int
-  name      String
-  lastname  String
-  email     String
-  phone     String
+  id         Int     @id @default(autoincrement())
+  dealerId   Int
+  postId     Int?
+  vehicleId  Int?
 
-  dealer    Dealer @relation(fields: [dealerId], references: [id])
-  post      Post   @relation(fields: [postId], references: [id])
+  name       String
+  lastname   String
+  email      String
+  phone      String
+  response   Boolean @default(false) 
+
+  dealer     Dealer   @relation(fields: [dealerId], references: [id])
+  post       Post?    @relation(fields: [postId], references: [id])
+  vehicle    Vehicle? @relation(fields: [vehicleId], references: [id])
 }
+
 
 model User {
   id           Int     @id @default(autoincrement())

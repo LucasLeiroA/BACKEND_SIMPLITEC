@@ -9,7 +9,15 @@ const getAllPosts = async (req, res) => {
         const posts = await prisma.post.findMany({
             where: { dealerId },
             include: {
-                vehicles: { include: { vehicle: true } }
+                vehicles: {
+                    include: {
+                        vehicle: {
+                            include: {
+                                images: true 
+                            }
+                        }
+                    }
+                }
             }
         });
         res.json(posts);
@@ -30,7 +38,13 @@ const getPostById = async (req, res) => {
             where: { id: postId },
             include: {
                 vehicles: {
-                    include: { vehicle: true }
+                    include: {
+                        vehicle: {
+                            include: {
+                                images: true
+                            }
+                        }
+                    }
                 }
             }
         });

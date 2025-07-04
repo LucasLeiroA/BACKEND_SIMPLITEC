@@ -44,6 +44,9 @@ const createAccessory = async (req, res) => {
         const dealerId = parseInt(req.params.dealerId);
         const { name, description, price, stock, vehicleId } = req.body;
 
+        console.log(req.body);
+        
+
         const accessory = await prisma.accessory.create({
             data: {
                 name,
