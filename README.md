@@ -91,20 +91,6 @@ Una vez iniciado, puedes acceder a la API desde:
 http://localhost:3001
 ```
 
-## 📚 Documentación de la API
-
-La documentación de la API está disponible en **Swagger** en la siguiente URL:
-
-```
-http://localhost:3001/api-docs
-```
-
-## 🔧 Scripts disponibles
-
-- `npm run dev` - Inicia el servidor en modo desarrollo
-- `npm start` - Inicia el servidor en modo producción
-- `npm run build` - Compila el proyecto
-- `npm run test` - Ejecuta las pruebas
 
 ## 📁 Estructura del proyecto
 
@@ -125,18 +111,5 @@ simplictec-backend/
 └── README.md
 ```
 
-## 🤝 Contribuir
-
-1. Haz un fork del proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está licenciado bajo la [MIT License](LICENSE).
-
----
 
 **Desarrollado con ❤️ por el equipo de SimpliTEC**
