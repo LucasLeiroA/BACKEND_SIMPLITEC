@@ -28,9 +28,8 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 │   ├── routes/
 │   ├── services/
 │   └── index.js
-├── Dockerfile (opcional)
 ├── docker-compose.yml    # Servicios opcionales: PostgreSQL, Redis
-├── .env                  # Variables de entorno
+├── .env.example          # Ejemplo de variables de entorno
 ├── package.json
 └── README.md
 ```
@@ -40,11 +39,11 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 ## 🔧 Requisitos
 
 - Node.js >= 18
-- Docker y Docker Compose (solo si lo usás)
+- Docker y Docker Compose (recomendado)
 
 ---
 
-## 🚀 FLUJO COMPLETO PARA LEVANTAR EL BACKEND (MODO LOCAL)
+## 🚀 FLUJO COMPLETO PARA LEVANTAR EL BACKEND
 
 ### 1. 📥 Clonar el repositorio
 
@@ -63,26 +62,15 @@ npm install
 
 ---
 
-### 3. 🧪 Crear el archivo `.env`
+### 3. 🔐 Crear el archivo `.env`
 
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/simplictec_db
-PORT=3001
+Copiá el archivo `.env.example` y completalo con tus credenciales:
 
-CLOUDINARY_CLOUD_NAME=deyja2bgv
-CLOUDINARY_API_KEY=321482273426451
-CLOUDINARY_API_SECRET=sj2kGEouf4knlTT9UWPFRKpZAPM
-
-JWT_SECRET=mi_super_clave_secreta_123456789
-
-MAIL_USER=lucasleiroa@gmail.com
-MAIL_PASS=ghbv vzjh cqns eion
-
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
+```bash
+cp .env.example .env
 ```
 
-> 🔐 Asegurate de tener PostgreSQL y Redis corriendo (por Docker o servicios locales)
+> Nunca subas tus credenciales reales (`DATABASE_URL`, `JWT_SECRET`, `CLOUDINARY_API_*`, `MAIL_PASS`) a GitHub. Usá `.env.example` como referencia.
 
 ---
 
@@ -95,17 +83,35 @@ npx prisma migrate deploy
 
 ---
 
-### 5. ▶️ Levantar el servidor
+### 5. ▶️ Levantar el servidor local
 
 ```bash
 npm run dev
 ```
 
-Esto iniciará tanto el backend como el worker de leads. El backend correrá en:
+Esto iniciará tanto el backend como el worker de leads. El backend estará disponible en:
 
 ```
 http://localhost:3001
 ```
+
+---
+
+### 6. 🐳 Alternativa: levantar con Docker
+
+Si querés usar Docker (recomendado):
+
+```bash
+docker-compose up --build
+```
+
+Esto levantará:
+- PostgreSQL (`db`)
+- Redis (`redis`)
+- Backend (`backend-simplitec`)
+- Worker de leads (`lead-worker`)
+
+Ya no necesitás correr Prisma manualmente: lo hace el contenedor.
 
 ---
 
@@ -183,8 +189,8 @@ Authorization: Bearer <token>
 1. Cloná el repo
 2. Instalá dependencias
 3. Configurá `.env`
-4. Aplicá migraciones
-5. Ejecutá `npm run dev`
+4. Aplicá migraciones o usá Docker
+5. Ejecutá `npm run dev` o `docker-compose up`
 
 ---
 
