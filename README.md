@@ -2,7 +2,7 @@
 
 Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gestión de concesionarios, vehículos, publicaciones, accesorios y leads.
 
-> Este backend está desarrollado con **Node.js**, **Express**, **Prisma** y **PostgreSQL**, y se ejecuta fácilmente con **Docker**.
+> Este backend está desarrollado con **Node.js**, **Express**, **Prisma** y **PostgreSQL**, y puede ejecutarse con o sin Docker.
 
 ---
 
@@ -14,7 +14,7 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 - PostgreSQL
 - JWT Auth
 - Cloudinary (para imágenes)
-- Docker / Docker Compose
+- Docker (opcional)
 
 ---
 
@@ -28,9 +28,9 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 │   ├── routes/
 │   ├── services/
 │   └── index.js
-├── Dockerfile            # Backend Dockerfile
-├── docker-compose.yml    # Compose para backend + PostgreSQL
-├── .env                  # Variables de entorno (local)
+├── Dockerfile (opcional)
+├── docker-compose.yml    # Servicios opcionales: PostgreSQL, Redis
+├── .env                  # Variables de entorno
 ├── package.json
 └── README.md
 ```
@@ -39,11 +39,12 @@ Este es el backend oficial del sistema **SimpliTEC**, una plataforma para gesti�
 
 ## 🔧 Requisitos
 
-- Docker y Docker Compose instalados ✅
+- Node.js >= 18
+- Docker y Docker Compose (solo si lo usás)
 
 ---
 
-## 🚀 FLUJO COMPLETO PARA LEVANTAR EL PROYECTO DESDE CERO
+## 🚀 FLUJO COMPLETO PARA LEVANTAR EL BACKEND (MODO LOCAL)
 
 ### 1. 📥 Clonar el repositorio
 
@@ -54,48 +55,71 @@ cd simplictec-backend
 
 ---
 
-### 2. ⚙️ Crear el archivo `.env`
-
-En la raíz del proyecto, crear un archivo llamado `.env` con el siguiente contenido:
-
-```env
-DATABASE_URL=postgresql://postgres:postgres@db:5432/simplictec_db
-JWT_SECRET=supersecret
-CLOUDINARY_CLOUD_NAME=your_cloud
-CLOUDINARY_API_KEY=your_key
-CLOUDINARY_API_SECRET=your_secret
-```
-
-> 🔐 Los datos de Cloudinary se pueden dejar vacíos si no vas a trabajar con imágenes por ahora.
-
----
-
-### 3. 🐳 Levantar todo con Docker Compose
-
-Ejecutá:
+### 2. ⚙️ Instalar dependencias
 
 ```bash
-docker-compose up --build
+npm install
 ```
-
-Este comando:
-- Levanta un contenedor PostgreSQL (`simplictec_db`)
-- Construye el backend y aplica las migraciones con `npx prisma migrate deploy`
-- Crea automáticamente un usuario admin de prueba en la base de datos
 
 ---
 
-### 4. ✅ Usuario admin de prueba creado automáticamente
+### 3. 🧪 Crear el archivo `.env`
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/simplictec_db
+PORT=3001
+
+CLOUDINARY_CLOUD_NAME=deyja2bgv
+CLOUDINARY_API_KEY=321482273426451
+CLOUDINARY_API_SECRET=sj2kGEouf4knlTT9UWPFRKpZAPM
+
+JWT_SECRET=mi_super_clave_secreta_123456789
+
+MAIL_USER=lucasleiroa@gmail.com
+MAIL_PASS=ghbv vzjh cqns eion
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+```
+
+> 🔐 Asegurate de tener PostgreSQL y Redis corriendo (por Docker o servicios locales)
+
+---
+
+### 4. 🧱 Ejecutar comandos de Prisma
+
+```bash
+npx prisma generate
+npx prisma migrate deploy
+```
+
+---
+
+### 5. ▶️ Levantar el servidor
+
+```bash
+npm run dev
+```
+
+Esto iniciará tanto el backend como el worker de leads. El backend correrá en:
+
+```
+http://localhost:3001
+```
+
+---
+
+### ✅ Usuario admin creado automáticamente (por migración)
 
 | Campo     | Valor                 |
 |-----------|-----------------------|
-| Email     | `admin@gmail.com` |
+| Email     | `admin@simplitec.com` |
 | Contraseña| `admin123`            |
-| Rol       | `admin`               |
+| Rol       | `ADMIN`               |
 
-Puedes iniciar sesión directamente vía frontend o con herramientas como Postman:
+Podés hacer login con:
 
-```
+```http
 POST http://localhost:3001/auth/login
 {
   "email": "admin@simplitec.com",
@@ -105,38 +129,19 @@ POST http://localhost:3001/auth/login
 
 ---
 
-### 5. 🌐 El backend estará disponible en:
-
-```
-http://localhost:3001
-```
-
----
-
-### 6. (Opcional) Ver base de datos en navegador
-
-```bash
-npx prisma studio
-```
-
-Esto abrirá una interfaz gráfica para explorar tus tablas y datos.
-
----
-
 ## 📥 Comandos útiles
 
-- 🔁 Reiniciar todo desde cero:
+- Regenerar cliente Prisma:
 ```bash
-docker-compose down -v
-npx prisma migrate reset
+npx prisma generate
 ```
 
-- 📦 Aplicar migraciones manualmente:
+- Aplicar migraciones:
 ```bash
 npx prisma migrate deploy
 ```
 
-- 📊 Abrir Prisma Studio:
+- Ver base de datos:
 ```bash
 npx prisma studio
 ```
@@ -147,11 +152,10 @@ npx prisma studio
 
 ```json
 "scripts": {
-  "dev": "nodemon src/index.js",
+  "dev": "concurrently \"npm run dev:api\" \"npm run start:worker\"",
+  "dev:api": "nodemon src/index.js",
   "start": "node src/index.js",
-  "migrate": "prisma migrate dev",
-  "deploy": "prisma migrate deploy",
-  "studio": "prisma studio"
+  "start:worker": "node src/workers/leadWorker.js"
 }
 ```
 
@@ -178,8 +182,9 @@ Authorization: Bearer <token>
 
 1. Cloná el repo
 2. Instalá dependencias
-3. Usá Docker para levantar todo rápido
-4. ¡Enviá tus mejoras con un pull request!
+3. Configurá `.env`
+4. Aplicá migraciones
+5. Ejecutá `npm run dev`
 
 ---
 
