@@ -8,8 +8,8 @@ describe('Vehicle Endpoints (requiere JWT)', () => {
     const dealerId = 3;
 
     beforeAll(async () => {
-        const email = 'dealer1@example.com';
-        const password = 'dealer123';
+        const email = 'userCordoba123@gmail.com';
+        const password = 'admin123';
         const role = 'dealer';
 
         const existing = await prisma.user.findUnique({ where: { email } });
